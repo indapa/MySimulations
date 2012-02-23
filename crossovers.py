@@ -1,10 +1,11 @@
-#!/usr/bin/python2.6
+#!/usr/bin/python2.6 
 import sys
 import os
 import string
 import re
 from optparse import OptionParser
 import numpy as np
+import bx.seq.twobit
 from Interval import Interval
 
 """ generate crossover intervals that represent meiosis events to generate haploid gamete(s) """
@@ -13,16 +14,19 @@ def main():
     usage = "usage: %prog [options] chromInfo.bed"
     parser = OptionParser(usage)
     parser.add_option("--morgan", type="float", dest="morgan", default=100000000, help="physical length of 1 Morgan (default 100Mbp)")
-    parser.add_option("--paternal", type="string", dest="paternal", help="fasta representing paternal haplotype")
-    parser.add_option("--maternal", type="string", dest="maternal", help="fasta representing maternal haplotype")
+    parser.add_option("--paternal", type="string", dest="paternal", help="2bit file representing paternal haplotype")
+    parser.add_option("--maternal", type="string", dest="maternal", help="2bit file representing maternal haplotype")
+    
     (options, args)=parser.parse_args()
 
     if options.maternal == None:
-        sys.stderr.write("please provide maternal fasta file!\n")
-        exit(1)
+        pass
+        #sys.stderr.write("please provide maternal fasta file!\n")
+        #exit(1)
     if options.paternal == None:
-        sys.stderr.write("please provide paternal fasta file!\n")
-        exit(1)
+        pass
+        #sys.stderr.write("please provide paternal fasta file!\n")
+        #exit(1)
 
     crossoverfh=open("crossover.log", 'w')
 
@@ -49,6 +53,7 @@ def main():
             haplotype="maternal"
         else:
             haplotype="paternal"
+        intervalstring=''
         #now get the crossover points
         if ncrossovers ==0:
             intervalstring="\t".join([haplotype, chrom, "+",'0', str(chromSizes[i]), str(ncrossovers),',',','])
@@ -82,9 +87,18 @@ def main():
                 #print ends
                 intervalstring="\t".join([haplotype, chrom, "+",str(starts[0]), str(ends[-1]),str(ncrossovers), startstrings, endstrings])
             #print intervalstring
-            intervalobj=Interval(intervalstring)
-            for (name, start,end) in intervalobj.yieldStartEnds():
-                print haplotype, chrom, start, end
+        intervalobj=Interval(intervalstring)
+        inbtwn_name=''
+        print intervalstring
+        for (name, chrom, start,end) in intervalobj.yieldStartEnds():
+            print name, start, end
+        print "=="
+        for (inbtwn_name, chrom, start,end) in intervalobj.yieldInBtwn():
+            print inbtwn_name, chrom, start, end
+        if intervalobj.getLastSubIntervalEnd() != -1 and intervalobj.getLastSubIntervalEnd() < chromsize:
+            print inbtwn_name, chrom,  intervalobj.getLastSubIntervalEnd(), chromsize
+
+        print
         #print
 
 if __name__ == "__main__":
