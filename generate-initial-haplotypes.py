@@ -22,13 +22,15 @@ def sampleSNPFreq(N, sfs,L):
         j=i+1
         #print sfs[i], j
         Ei_allelefrq= np.random.uniform(0, freqProp[i], int(sfs[i])).round(decimals=3)
-        #print len(Ei_allelefrq)
+        print j, len(Ei_allelefrq)
+        Ei_allelefrq_str=",".join(map(str, Ei_allelefrq))
+        #print j, freqProp[i], Ei_allelefrq_str
         total+=len(Ei_allelefrq)
         #print len(Ei_allelefrq)
         #exp_val=np.mean(Ei_allelefrq)
         #print sfs[i],j
         for frq in Ei_allelefrq:
-            site_position=np.random.random_integers(1, L,1)[0]
+            # now to assign genotypes, we draw from a binomial in proportional to the sampled allele frq, which was sampled in proportion to neutral SFS
             genotypes=list( np.random.binomial(2, frq, size=N/2) )
             genotypes_list.append(genotypes)
             
@@ -103,7 +105,7 @@ def main():
         sys.stderr.write("unable to open twobit file!\n")
 
     chromsizes={}#key chromName, value is length
-    snp_positions={} #key chrom, numpy.array of positiosn of snps
+   
     #first read the chromsizes in to dict
     chromfh=open(options.chrombed, 'r')
     for line in chromfh:
@@ -123,20 +125,19 @@ def main():
         
         #now get the  netural SFS
         sfs=returnNeutralSFS(thetaScaled, options.N)
-        #numper of seg sites is the count of each bin in the SFS
+        #number of seg sites is the count of each bin in the SFS
         segsites=np.sum(np.array(sfs))
         #print segsites
+
         #now conditioned upon the numebr of snps (segsites), place them randomly along the length of the chromosome
+        # this results in a non-unique set of sites with the code below .... how to fix this???
         points=list(np.random.random_integers(1, high=L, size=segsites) )
         
       
         #now sample allele freq in proportion to the neutral SFS
         genotypes_list=sampleSNPFreq(options.N, sfs,L)
 
-        #now zip the locations of the segsites with their binomially sampled genotypes
-        # [ (position, [1,0,2,1 ...] ), .... ]
-        #ziplist=zip(points, genotypes_list)
-
+        
         #make a numpy 2d matrix
         genotype_matrix=[]
         for  genos in genotypes_list:
@@ -147,12 +148,12 @@ def main():
 
         #make a numpy 2-d array where nrows = #segsites ncols= N/2 of desired haplotypes
         genotype_nd_matrix=np.array(genotype_matrix)
-        print np.shape(genotype_nd_matrix)
+        #print np.shape(genotype_nd_matrix)
 
         #list of tuples with [ (pos, ref, alt) ... ]
         site_and_alleles=[]
-        #now assign ref and alt alleles according to Jukes-Cantor ....
 
+        #now assign ref and alt alleles according to Jukes-Cantor ....
         sys.stderr.write("assigning ref and alt alleles according Jukes-Cantor and writing out *.map file...\n")
         for i in range(len(points)):
             (start, end)= ( int(points[i])-1, int(points[i]) )
@@ -181,14 +182,16 @@ def main():
             else:
                 sex='2'
             maternal_haplotype=list(twobit[chr][0:L])
-            maternal_name="_".join([chr, 'maternal', str(j)])
+            maternal_name="_".join([chr, 'maternal', "sample"+str(j)])
             
             paternal_haplotype=list(twobit[chr][0:L])
-            paternal_name="_".join([chr, 'paternal', str(j)])
+            paternal_name="_".join([chr, 'paternal', "sample"+str(j)])
 
+            
+            #we take the h-th column, corresponding the genotypes of the h-th individual (this is the unphased haplotype)
             unphased_genotypes=genotype_nd_matrix[:,h]
 
-            print h, np.shape(unphased_genotypes), len(points)
+            
             #now for ith segregating site get its genotype and correpsonding ref and alt allele
             genotypes=[]
             for i in range(len(unphased_genotypes)):
@@ -224,35 +227,13 @@ def main():
             pedstring="\t".join([pedinfo, genotype_string])
             pedfh.write(pedstring + '\n')
 
-            writefasta("".join(maternal_haplotype), maternal_name, maternal_name+".fa")
-            writefasta("".join(paternal_haplotype), paternal_name, paternal_name+".fa")
+            writefasta("".join(maternal_haplotype), chr, maternal_name+".fa")
+            writefasta("".join(paternal_haplotype), chr, paternal_name+".fa")
 
 
 
 
-        #snp_positions[chr]=points
 
-    #for chr in snp_positions.keys():
-    #    sys.stderr.write(chr+"\n")
-    #    end=int(chromsizes[chr])
-
-    #    sequence=list(twobit[chr][0:end])
-    #    print len(sequence), end
-    #    print chr, snp_positions[chr]
-    #    positions=snp_positions[chr]
-
-    #    print len(sequence)
-    #    sys.stderr.write("editing input 2bit with mutations ...\n")
-    #    for p in positions:
-    #        ref=sequence[p]
-    #        if ref == 'N': continue
-    #        ref=ref.upper()
-    #        alt=JC_rates(ref)
-    #        bedstring="\t".join([chr, str(p), str(p+1), ref, alt])
-    #        mutationfh.write(bedstring+"\n")
-    #        sequence[p]=alt
-
-    #    writefasta("".join(sequence), options.hap+"_"+chr, options.hap+"_"+chr+".fa")
                     
 if __name__ == "__main__":
     main()
