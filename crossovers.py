@@ -1,4 +1,4 @@
-#!/usr/bin/python2.6 
+#!/usr/bin/env python
 import sys
 import os
 import string
@@ -166,7 +166,7 @@ def main():
         #finally write out teh fasta file
         sys.stderr.write("writing gametic fasta file ... " + chrom + "\n")
         gametefastaname="_".join([chrom,"gamete", "meiosis"+str(options.nmeiosis), options.samplename])
-        writefasta("".join(gametesequence), chrom, gametefastaname+".fa")
+        writefasta("".join(gametesequence), chrom + " " + options.samplename, gametefastaname+".fa")
         
 
 if __name__ == "__main__":

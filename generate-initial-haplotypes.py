@@ -1,4 +1,4 @@
-#!/usr/bin/python2.6
+#!/usr/bin/env python
 import sys
 import os
 import string
@@ -85,6 +85,7 @@ def main():
     parser.add_option("--chrom", type="string", dest="chrom", help="chromosome to simulate haplotypes for", default='chr22')
     parser.add_option("--N", type="int", dest="N", help="number of founder chromosomes to simulate", default=50)
     (options, args)=parser.parse_args()
+
     #if options.hap == None:
     #    sys.stderr.write("pleas provide --hap value!\n")
     #    exit(1)
@@ -227,8 +228,8 @@ def main():
             pedstring="\t".join([pedinfo, genotype_string])
             pedfh.write(pedstring + '\n')
 
-            writefasta("".join(maternal_haplotype), chr, maternal_name+".fa")
-            writefasta("".join(paternal_haplotype), chr, paternal_name+".fa")
+            writefasta("".join(maternal_haplotype), chr + " maternal", maternal_name+".fa")
+            writefasta("".join(paternal_haplotype), chr + " paternal", paternal_name+".fa")
 
 
 
