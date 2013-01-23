@@ -31,12 +31,12 @@ def main():
     usage = "usage: %prog [options] chromInfo.bed"
     parser = OptionParser(usage)
     parser.add_option("--morgan", type="float", dest="morgan", default=100000000, help="physical length of 1 Morgan (default 100Mbp)")
-    parser.add_option("--paternaltwobit", type="string", dest="paternaltbf", help="2bit file representing paternal haplotype")
-    parser.add_option("--maternaltwobit", type="string", dest="maternaltbf", help="2bit file representing maternal haplotype")
+    parser.add_option("--grandpaternaltwobit", type="string", dest="paternaltbf", help="2bit file representing (grand)paternal haplotype")
+    parser.add_option("--grandmaternaltwobit", type="string", dest="maternaltbf", help="2bit file representing (grand)maternal haplotype")
     parser.add_option("--samplename", type="string", dest="samplename", help="sample name for which you are generating a gamete for", default="gamete")
     parser.add_option("--meiosis", type="int", dest="nmeiosis", help="meiotic event id (default 1) ", default=1)
     parser.add_option("--chromSize", type="int", dest="chromSize", help="length of chromosome", default=1000000)
-    parser.add_option("--theta", type="float", dest='theta', help='crossover rate', default=0)
+    parser.add_option("--theta",  type="float", dest='theta', help='crossover rate', default=0)
     (options, args)=parser.parse_args()
 
     if options.maternaltbf == None:
