@@ -45,8 +45,8 @@ def main():
         exit(1)
 
 
-    paternalname,ext = os.path.basename(options.paternaltbf)
-    maternalname,ext = os.path.basename(options.maternaltbf)
+    paternalname = os.path.basename(options.paternaltbf)
+    maternalname = os.path.basename(options.maternaltbf)
 
 
 
