@@ -21,10 +21,6 @@ def twoBitExtract(bedstring, twobit):
     return sequence.upper()
 
 
-
-
-
-
 """ generate crossover intervals that represent meiosis events to generate haploid gamete(s)
     given the maternal and paternal 2bit file. """
 def main():
@@ -49,8 +45,8 @@ def main():
         exit(1)
 
 
-    paternalname,ext = os.path.splitext(options.paternaltbf)
-    maternalname,ext = os.path.splitext(options.maternaltbf)
+    paternalname,ext = os.path.basename(options.paternaltbf)
+    maternalname,ext = os.path.basename(options.maternaltbf)
 
 
 
