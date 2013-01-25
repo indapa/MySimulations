@@ -45,8 +45,8 @@ def main():
         exit(1)
 
 
-    paternalname = os.path.basename(options.paternaltbf)
-    maternalname = os.path.basename(options.maternaltbf)
+    paternalname = str.split ( os.path.basename(options.paternaltbf) , '.')[0]
+    maternalname = str.split ( os.path.basename(options.maternaltbf) , '.')[0]
 
 
 
@@ -180,7 +180,7 @@ def main():
     #finally write out teh fasta file
     sys.stderr.write("writing gametic fasta file ... " + chrom + "\n")
     gametefastaname="_".join([chrom,"gamete", "meiosis"+str(options.nmeiosis), options.samplename])
-    writefasta("".join(gametesequence), chrom + " " + options.samplename, gametefastaname+".fa")
+    writefasta("".join(gametesequence), chrom + "." + options.samplename, gametefastaname+".fa")
 
 
 if __name__ == "__main__":
