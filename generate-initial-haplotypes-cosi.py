@@ -45,9 +45,10 @@ def main():
     except:
         sys.stderr.write("unable to open twobit file!\n")
 
+    basename=os.path.basename( options.posfile )
 
     cosiposfh=open(options.posfile, 'r')
-    mapfh=open (options.posfile+".map", 'w')
+    mapfh=open (basename+".map", 'w')
 
     altbases=[]
     altallelenum=[]
