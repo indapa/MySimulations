@@ -47,22 +47,22 @@ def main():
 
 
     cosiposfh=open(options.posfile, 'r')
+    mapfh=open (options.posfile+".map", 'w')
 
     altbases=[]
     altallelenum=[]
     positions=[]
+
     for line in cosiposfh:
-
-
-
        #refbase= get from tbf
 
         if 'SNP' in line:
             continue
         else:
             (snp, chrom, pos, allele1, freq1, allele2, freq2)=line.strip().split('\t')
-
-            
+            #print allele1, allele2
+            #from the cosi documentation
+            #allele 1 is "derived" allele 2 in ancestral
 
             start=int(pos)-1
             end=int(pos)
@@ -80,31 +80,38 @@ def main():
 
             altbase=JC_rates(refbase)
             altbases.append(altbase)
+            outstring="\t".join( [ chrom, str(start), str(end), refbase, altbase ] )
+            mapfh.write(outstring+"\n")
 
 
-            if freq1 < freq2:
-                altAllele=allele1
-            else:
-                altAllele=allele2
             #print chrom, pos, refbase, altbase, altAllele, allele1, freq1, allele2, freq2
-            altallelenum.append(altAllele)
-
-    #print len(positions)
+            altallelenum.append(allele1)
+    
+    if len(positions) != len(altbases):
+        sys.stderr.write(" total number of segregating positions and total number of alt allels must be equal!\n")
+        sys.exit(1)
 
     happosfh=open(options.hapfile, 'r')
-
+    sys.stderr.write("constructing haplotype sequences ...\n")
+    refsequence=list( twobit[chrom][0:1000000] )
     for line in happosfh:
         (hapid, popid, genostr) = line.strip().split('\t')
         genotypes=genostr.split(' ')
-        print len(genotypes)
-
+        if len(genotypes) != len(positions):
+            sys.stderr.write("unequal number of genotypes and segregating site positions...\n")
+            sys.exit(1)
+        #so we assign the reference to the haplotype seq
         hapsequence=list( twobit[chrom][0:1000000] )
+        #we iterate thru the genotypes at each s.s.
         for i in range(0,len(genotypes) ):
-            print positions[i], altallelenum[i], altbases[i], genotypes[i]
+            #print positions[i], altallelenum[i], altbases[i], genotypes[i]
+            # if the allele matches the alt allele
             if altallelenum[i] == genotypes[i]:
                 print "haplotype has alt allele at this position"
+                print 
+                #we assign the alt base
                 hapsequence[ positions[i] ] = altbases[i]
-
+                #print hapsequence[ positions[i] ], altbases[i], refsequence [ positions[i] ]
         seqname="hap"+hapid
         writefasta("".join(hapsequence), seqname, "hap"+hapid+".fa")
 
