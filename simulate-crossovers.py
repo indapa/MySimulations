@@ -48,7 +48,7 @@ def main():
     paternalname = str.split ( os.path.basename(options.paternaltbf) , '.')[0]
     maternalname = str.split ( os.path.basename(options.maternaltbf) , '.')[0]
 
-
+    print paternalname, maternalname
 
 
 
@@ -128,6 +128,7 @@ def main():
             #print ends
             intervalstring="\t".join([haplotype, chrom, "+",str(starts[0]), str(ends[-1]),str(ncrossovers), startstrings, endstrings])
             #print intervalstring
+    print intervalstring
     intervalobj=Interval(intervalstring)
     if haplotype=='maternal':
         inbtwn_name='paternal'
@@ -144,11 +145,14 @@ def main():
             (chr, start, end, name)=bedstring.split('\t')
             chr=maternalname
             bedstring="\t".join([ chr, start,end,name])
+            print bedstring
             gametesequence += twoBitExtract(bedstring, twobit_maternal)
         else:
             (chr, start, end, name)=bedstring.split('\t')
+            
             chr=paternalname
             bedstring="\t".join([ chr, start,end,name])
+            print bedstring
             gametesequence += twoBitExtract(bedstring, twobit_paternal)
     #print "=="
     for bedstring in intervalobj.yieldInBtwnBedstring(inbtwn_name):
@@ -180,7 +184,8 @@ def main():
     #finally write out teh fasta file
     sys.stderr.write("writing gametic fasta file ... " + chrom + "\n")
     gametefastaname="_".join([chrom,"gamete", "meiosis"+str(options.nmeiosis), options.samplename])
-    writefasta("".join(gametesequence), chrom + "." + options.samplename, gametefastaname+".fa")
+    #writefasta("".join(gametesequence), chrom + "." + options.samplename, gametefastaname+".fa")
+    writefasta("".join(gametesequence),options.samplename, options.samplename+".fa")
 
 
 if __name__ == "__main__":
